@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Code Review Assistant | PR Review Dashboard</title>
+  <meta name="description" content="AI-powered code review assistant for Pull Requests. Detect bugs, security issues and code-quality problems instantly." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="navbar">
+    <div class="navbar__inner">
+      <a href="#home" class="navbar__logo">
+        <span class="navbar__logo-icon">◈</span>
+        <span>AI Code Review<span class="accent">Assistant</span></span>
+      </a>
+
+      <nav class="navbar__links" id="navLinks">
+        <a href="#home" class="nav-link active" data-section="home">Home</a>
+        <a href="#code-review" class="nav-link" data-section="code-review">Code Review</a>
+        <a href="#pull-requests" class="nav-link" data-section="pull-requests">Pull Requests</a>
+        <a href="#dashboard" class="nav-link" data-section="dashboard">Dashboard</a>
+        <a href="#about" class="nav-link" data-section="about">About</a>
+      </nav>
+
+      <div class="navbar__actions">
+        <span id="backendStatus" class="status-pill status-pill--checking">
+          <span class="status-dot"></span> Checking backend…
+        </span>
+        <a href="https://github.com" target="_blank" rel="noopener" class="btn btn--ghost btn--sm">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+            0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+            -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07
+            -1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82
+            .64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12
+            .51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48
+            0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          GitHub
+        </a>
+        <button class="navbar__toggle" id="navToggle" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero" id="home">
+    <div class="hero__canvas-wrap">
+      <canvas id="heroCanvas"></canvas>
+    </div>
+
+    <div class="hero__content">
+      <span class="hero__badge">⚡ Hackathon Build · AI/Agentic AI</span>
+      <h1 class="hero__title">AI Code Review Assistant</h1>
+      <p class="hero__subtitle">
+        Review Pull Requests faster. Detect bugs, security issues and code-quality problems with AI.
+      </p>
+      <div class="hero__actions">
+        <button class="btn btn--primary" id="startReviewBtn">Start Code Review</button>
+        <button class="btn btn--outline" id="viewDemoBtn">View Demo</button>
+      </div>
+
+      <div class="hero__stats" id="heroStats">
+        <div class="stat-card">
+          <span class="stat-card__value" data-stat="prsReviewed">0</span>
+          <span class="stat-card__label">PRs Reviewed</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__value" data-stat="bugsDetected">0</span>
+          <span class="stat-card__label">Bugs Detected</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__value" data-stat="securityIssues">0</span>
+          <span class="stat-card__label">Security Issues</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__value" data-stat="avgReviewTime">0.0s</span>
+          <span class="stat-card__label">Avg Review Time</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CODE REVIEW SECTION ================= -->
+  <section class="section" id="code-review">
+    <div class="section__header">
+      <h2>Code Review</h2>
+      <p>Paste a snippet or a Pull Request diff and let the AI reviewer scan it instantly.</p>
+    </div>
+
+    <div class="glass-panel editor-panel">
+      <div class="editor-panel__toolbar">
+        <div class="editor-panel__lang">
+          <label for="languageSelect">Language</label>
+          <select id="languageSelect">
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="cpp">C++</option>
+          </select>
+        </div>
+        <div class="editor-panel__buttons">
+          <button class="btn btn--ghost btn--sm" id="sampleCodeBtn">Sample Code</button>
+          <button class="btn btn--ghost btn--sm" id="clearCodeBtn">Clear</button>
+          <button class="btn btn--primary btn--sm" id="analyzeCodeBtn">
+            <span id="analyzeBtnLabel">Analyze Code</span>
+            <span id="analyzeSpinner" class="spinner spinner--hidden"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="editor-panel__body">
+        <div class="editor-gutter" id="editorGutter">1</div>
+        <textarea
+          id="codeInput"
+          class="code-textarea"
+          spellcheck="false"
+          placeholder="// Paste your code here...
+function login(user, pass) {
+  if (user.password == pass) {
+    console.log('logged in');
+  }
+}"
+        ></textarea>
+      </div>
+
+      <p class="editor-panel__hint" id="codeInputError"></p>
+    </div>
+
+    <!-- Review Results -->
+    <div class="review-results" id="reviewResults">
+      <div class="review-results__placeholder" id="reviewPlaceholder">
+        <p>🧠 Your AI review results will appear here after you analyze some code.</p>
+      </div>
+
+      <div class="review-results__content" id="reviewContent" hidden>
+
+        <div class="score-banner glass-panel">
+          <div class="score-ring-wrap">
+            <svg class="score-ring" viewBox="0 0 120 120">
+              <circle class="score-ring__bg" cx="60" cy="60" r="52"></circle>
+              <circle class="score-ring__fg" id="scoreRingFg" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <span class="score-ring__value" id="scoreValue">0</span>
+          </div>
+          <div class="score-banner__text">
+            <h3>Overall Score</h3>
+            <p id="scoreSummary">—</p>
+            <div class="score-banner__actions">
+              <button class="btn btn--ghost btn--sm" id="resetReviewBtn">Reset Review</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-cards" id="metricCards">
+          <div class="metric-card glass-panel" data-metric="bugs">
+            <span class="metric-card__icon">🐞</span>
+            <span class="metric-card__value" id="metricBugs">0</span>
+            <span class="metric-card__label">Bugs</span>
+          </div>
+          <div class="metric-card glass-panel" data-metric="security">
+            <span class="metric-card__icon">🛡</span>
+            <span class="metric-card__value" id="metricSecurity">0</span>
+            <span class="metric-card__label">Security Issues</span>
+          </div>
+          <div class="metric-card glass-panel" data-metric="performance">
+            <span class="metric-card__icon">⚙</span>
+            <span class="metric-card__value" id="metricPerformance">0</span>
+            <span class="metric-card__label">Performance</span>
+          </div>
+          <div class="metric-card glass-panel" data-metric="quality">
+            <span class="metric-card__icon">✨</span>
+            <span class="metric-card__value" id="metricQuality">0</span>
+            <span class="metric-card__label">Code Quality</span>
+          </div>
+        </div>
+
+        <div class="issues-panel glass-panel">
+          <h3>Suggestions &amp; Issues</h3>
+          <div class="issues-list" id="issuesList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PULL REQUESTS SECTION ================= -->
+  <section class="section" id="pull-requests">
+    <div class="section__header">
+      <h2>Pull Requests</h2>
+      <p>A snapshot of recent Pull Requests scanned by the AI reviewer.</p>
+    </div>
+
+    <div class="pr-grid" id="prGrid"><!-- Populated by ui.js --></div>
+  </section>
+
+  <!-- ================= DASHBOARD SECTION ================= -->
+  <section class="section" id="dashboard">
+    <div class="section__header">
+      <h2>Dashboard</h2>
+      <p>Aggregate stats across every review run in this session.</p>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="glass-panel dashboard-card">
+        <span class="dashboard-card__label">Total PRs Reviewed</span>
+        <span class="dashboard-card__value" id="dashTotalPrs">12</span>
+      </div>
+      <div class="glass-panel dashboard-card">
+        <span class="dashboard-card__label">Issues Found</span>
+        <span class="dashboard-card__value" id="dashIssuesFound">0</span>
+      </div>
+      <div class="glass-panel dashboard-card">
+        <span class="dashboard-card__label">Security Issues</span>
+        <span class="dashboard-card__value" id="dashSecurityIssues">0</span>
+      </div>
+      <div class="glass-panel dashboard-card">
+        <span class="dashboard-card__label">Average Score</span>
+        <span class="dashboard-card__value" id="dashAvgScore">—</span>
+      </div>
+
+      <div class="glass-panel dashboard-chart-card">
+        <h3>Issue Severity Breakdown</h3>
+        <canvas id="severityChart" height="220"></canvas>
+      </div>
+
+      <div class="glass-panel dashboard-recent-card">
+        <h3>Recent Reviews</h3>
+        <ul class="recent-list" id="recentList">
+          <li class="recent-list__empty">No reviews yet this session. Run one from the Code Review tab.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ABOUT SECTION ================= -->
+  <section class="section section--about" id="about">
+    <div class="section__header">
+      <h2>About This Project</h2>
+      <p>Built for an AI / Agentic AI hackathon demo.</p>
+    </div>
+
+    <div class="about-grid">
+      <div class="glass-panel about-card">
+        <h3>🎯 What it does</h3>
+        <p>Analyzes submitted code or Pull Request diffs and flags bugs, security vulnerabilities, performance
+          bottlenecks and code-quality issues, with per-line explanations and suggested fixes.</p>
+      </div>
+      <div class="glass-panel about-card">
+        <h3>🧩 How it works</h3>
+        <p>The frontend sends code to a Node.js/Express REST API. A rule-based review engine analyzes the code today,
+          with a clean extension point to plug in a real LLM provider later — no frontend changes required.</p>
+      </div>
+      <div class="glass-panel about-card">
+        <h3>🚀 Why it matters</h3>
+        <p>Faster, more consistent first-pass reviews mean human reviewers spend their time on architecture and
+          design decisions instead of spotting eval() calls and empty catch blocks.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Built with Node.js, Express &amp; Three.js — AI Code Review Assistant © 2026</p>
+  </footer>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Three.js (3D hero scene) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/three-scene.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
